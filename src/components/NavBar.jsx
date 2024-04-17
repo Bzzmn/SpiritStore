@@ -24,7 +24,7 @@ const NavBar = () => {
         <li><a>Pantalones</a></li>
       </ul>
     </div>
-    <a className="logo p-0 flex translate-x-24 lg:translate-x-0"><img src="/src/assets/Grunge-Graffiti-Logo.svg" alt=""  /></a>
+    <a className="logo p-0 flex translate-x-24 lg:translate-x-0"><img src="./src/assets/grunge-Graffiti-Logo.svg" alt=""  /></a>
   </div>
   <div className="navbar-center hidden lg:flex ">
     <ul className="menu menu-horizontal px-1">
