@@ -3,20 +3,20 @@ import { useState, useEffect } from 'react';
 import ItemList from './ItemList';
 import { useParams } from 'react-router-dom';
 
-const ItemListContainer = ({ greeting }) => {
+const SubCategoryItemListContainer = ({ greeting }) => {
   const [items, setItems] = useState([]);
-  const {id}  = useParams();
+  const {id, subId}  = useParams();
  
   useEffect(() => {
     const promise = new Promise((resolve) => {
       setTimeout(() => {
-        resolve( id ? itemsArray.filter(item => item.category === id) : itemsArray);
+        resolve( id ? itemsArray.filter(item => item.category === id && item.subcategory === subId) : itemsArray);
       }, 200);
     })
     promise.then((data) => {
       setItems(data);
     })
-  }, [id]);
+  }, [id, subId]);
 
   return (
     <>
@@ -34,4 +34,4 @@ const ItemListContainer = ({ greeting }) => {
     </>
   )
 }
-export default ItemListContainer;
+export default SubCategoryItemListContainer;

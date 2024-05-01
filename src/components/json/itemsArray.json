@@ -1,0 +1,142 @@
+[
+  {
+    "id": 1,
+    "name": "Hoddie 30STM",
+    "description": "Black Hoddie Urban Style",
+    "price": 100.00,
+    "stock": 10,
+    "img": "https://store.thirtysecondstomars.com/cdn/shop/files/STUCK-HOODIE-NEW-MOCK-BOTH_720x.jpg", 
+    "category": "hoodies", 
+    "subcategory": null
+  }, 
+
+  {
+    "id": 2,
+    "name": "T Shirt 30STM",
+    "description": "Black T Shirt Urban Style",
+    "price": 80.00,
+    "stock": 8,
+    "img": "https://store.thirtysecondstomars.com/cdn/shop/files/SEASONS-TOUR-METALLIC-MARS-TEE-BOTH_720x.jpg", 
+    "category": "poleras", 
+    "subcategory": null
+  }, 
+
+  {
+    "id": 3,
+    "name": "T Shirt 30STM WT2024",
+    "description": "Black T Shirt Urban Style World Tour 2024",
+    "price": 80.00,
+    "stock": 8,
+    "img": "https://store.thirtysecondstomars.com/cdn/shop/files/Thirty-Seconds-To-Mars-SEASONS-TOUR-VINTAGE-SKULL-TEE-BOTH_2048x.jpg", 
+    "category": "poleras", 
+    "subcategory": null
+  }, 
+
+  {
+    "id": 4,
+    "name": "Hoodie 30STM WT2024",
+    "description": "Hoodie Shirt Urban Style World Tour 2024",
+    "price": 120.00,
+    "stock": 18,
+    "img": "https://store.thirtysecondstomars.com/cdn/shop/files/SEASONS-TOUR-VINTAGE-MARS-HOODIE-BOTH_9846268c-af41-4d49-b338-7c07659be6b7_720x.jpg", 
+    "category": "hoodies", 
+    "subcategory": null
+  }, 
+
+  {
+    "id": 5,
+    "name": "Urbano Grey Pants",
+    "description": "Urban Style Grey Pants",
+    "price": 75.00,
+    "stock": 6,
+    "img": "https://static.flexdog.com/flexdog-3/products/images/201b41e6-04ac-4500-b597-bf95e93e56b1.jpeg", 
+    "category": "pantalones", 
+    "subcategory": null
+  }, 
+
+  {
+    "id": 6,
+    "name": "Urbano Blue Pants",
+    "description": "Urban Style Blue Pants",
+    "price": 69.00,
+    "stock": 20,
+    "img": "https://static.flexdog.cz/flexdog-a/products/images/01b11c19-430c-4a56-ae27-30df3df708ef.jpeg", 
+    "category": "pantalones", 
+    "subcategory": null
+  }, 
+
+  {
+    "id": 7,
+    "name": "Beatiful Day T Shirt",
+    "description": "Sunset Colors T Shirt, Is the end of the world but is a beautiful day",
+    "price": 59.90,
+    "stock": 23,
+    "img": "https://store.thirtysecondstomars.com/cdn/shop/files/MARS-ITEOTW-SUBLIMATED-TEE-1-BOTH-2048_1296x.jpg", 
+    "category": "poleras", 
+    "subcategory": null
+  }, 
+
+  {
+    "id": 8,
+    "name": "Metallic Sweatpants",
+    "description": "30 Seconds to Mars Metallic Sweatpants, Urban Style",
+    "price": 45.99,
+    "stock": 12,
+    "img": "https://store.thirtysecondstomars.com/cdn/shop/files/METALLICMARSSWEATPANTS-2048_2048x.jpg", 
+    "category": "pantalones", 
+    "subcategory": null
+  }, 
+
+  {
+    "id": 9,
+    "name": "Billie Eilish Hoodie",
+    "description": "White Billie Eilish Hoodie, Urban Style",
+    "price": 42.99,
+    "stock": 18,
+    "img": "https://i.ebayimg.com/images/g/HpcAAOSwITRhdeja/s-l1600.jpg", 
+    "category": "hoodies", 
+    "subcategory": null
+  }, 
+  {
+    "id": 10,
+    "name": "Classic Shuck Taylor All Stars",
+    "description": "Classic Converse Shoes Black, Urban Style",
+    "price": 39.99,
+    "stock": 40,
+    "img": "https://media.converse.pl/catalog/product/m/9/m9160_d_107x1_1_20.jpg", 
+    "category": "zapatillas", 
+    "subcategory": "urbanas"
+  }, 
+  {
+    "id": 11,
+    "name": "Custom Chuck Taylor All Star Lift Platform By You",
+    "description": "Custom Converse Shoes, Urban Style",
+    "price": 89.99,
+    "stock": 34,
+    "img": "https://secure-render.nike.com/is/image/nikeid/?layer=0&src=ir(nikeidrender/CTASLiftHiSU24_v6?obj=/s/g5&src=00-3387&anchorN=0,0&show&obj=/s/g6&src=00-3387&anchorN=0,0&show&obj=/s/g7&src=00-3387&anchorN=0,0&show&obj=/s/g8&src=00-3387&anchorN=0,0&show&obj=/s/g9&color=F4F6EF&show&obj=/s/g11&color=151416&show&obj=/s/g13&color=f4f6ef&show&obj=/s/g18/shiny&color=cacdc9&show&obj=/s/g19&color=634437&show&obj=/s/g23&color=151416&show&obj=/s/g24&color=F4F6EF&show&obj=/s/g29&color=F4F6EF&show&obj=/s/g10&color=F4F6EF&show&obj=/s/g14&color=151416&show&obj=/s/g17&src=00-3387&anchorN=0,0&show&obj=/s/g20&src=00-3387&anchorN=0,0&show&obj=/s/g12&color=F9F1DF&show&obj=/s/g22/00a&show&obj=/s&req=object&fmt=png-alpha&icc=AdobeRGB)bgc=FFFFFF&fmt=jpeg&qlt=90&posN=0,-0.1&icc=AdobeRGB&wid=864", 
+    "category": "zapatillas", 
+    "subcategory": "urbanas"
+  }, 
+  
+  {
+    "id": 12,
+    "name": "NimbleToes Trail Addict",
+    "description": "Zapatillas de Trail Running Naranjas",
+    "price": 89.99,
+    "stock": 34,
+    "img": "https://saha.cl/wp-content/uploads/2022/06/1773875_pklein.jpg", 
+    "category": "zapatillas", 
+    "subcategory": "deportivas"
+  }, 
+
+  {
+    "id": 13,
+    "name": "NNormal Tomir 2.0 Verdes",
+    "description": "Zapatillas de Trail Running NNormal Verdes",
+    "price": 89.99,
+    "stock": 34,
+    "img": "https://www.tradeinn.com/f/14066/140668611/nnormal-zapatillas-de-trail-running-tomir-2.0.jpg", 
+    "category": "zapatillas", 
+    "subcategory": "deportivas"
+  } 
+]
