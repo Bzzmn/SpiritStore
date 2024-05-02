@@ -1,22 +1,34 @@
 import itemsArray from './json/itemsArray.json';
 import { useState, useEffect } from 'react';
 import ItemList from './ItemList';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const ItemListContainer = ({ greeting }) => {
   const [items, setItems] = useState([]);
-  const {id}  = useParams();
- 
+  const {id, subId}  = useParams();
+  const navigate = useNavigate();
+
+
   useEffect(() => {
     const promise = new Promise((resolve) => {
       setTimeout(() => {
-        resolve( id ? itemsArray.filter(item => item.category === id) : itemsArray);
+        
+        const filteredItems = 
+          id && subId ? itemsArray.filter(item => item.category === id && item.subcategory === subId) 
+          : id ? itemsArray.filter(item => item.category === id) 
+          : itemsArray;
+          
+        if(id && filteredItems.length === 0){
+          navigate('/404');
+        } else {
+          resolve(filteredItems);
+        }
       }, 200);
     })
     promise.then((data) => {
       setItems(data);
     })
-  }, [id]);
+  }, [id, subId, navigate]);
 
   return (
     <>

@@ -1,6 +1,5 @@
 import './App.css'
 import ItemListContainer from './components/ItemListContainer'
-import SubCategoryItemListContainer from './components/SubCateroryItemListContainer'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
 import ItemDetailContainer from './components/ItemDetailContainer'
@@ -15,12 +14,12 @@ function App() {
     <>
       <Router>
           <NavBar />
-          <div className='flex-grow'>
+          <div className='flex-grow flex flex-col'>
             <Routes>
               
                 <Route path="/" element={<ItemListContainer greeting={ greeting }/>} />
                 <Route path="/category/:id" element={<ItemListContainer greeting={ greeting }/>} />
-                <Route path="/category/:id/:subId" element={<SubCategoryItemListContainer greeting={ greeting }/>} />
+                <Route path="/category/:id/:subId" element={<ItemListContainer greeting={ greeting }/>} />
                 <Route path="/item/:id" element={<ItemDetailContainer />} />
                 <Route path="*" element={<Error404 />} />
             </Routes>
