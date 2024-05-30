@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-const ItemCount = ({stock}) =>   {
+const ItemCount = ({stock, onAdd}) =>   {
   const [count, setCount] = useState(1);
   const [stockItem, setStockItem] = useState(stock);
+  const [visible, setVisible] = useState(true);
 
   const add = () => {
     if (count < stock){
@@ -18,11 +20,12 @@ const ItemCount = ({stock}) =>   {
     setCount(count - 1);
   }
 
-  const onAdd = () => {
+  const addToCart = () => {
     if (stockItem >= count) {
       setStockItem(stockItem - count);
-      alert(`Se han agregado ${count} productos al carrito`);
+      onAdd(count);
       setCount(1);
+      setVisible(false)
     }
     else {
       alert('No hay suficiente stock');
@@ -41,7 +44,8 @@ const ItemCount = ({stock}) =>   {
         <button className='w-[30%] h-8 bg-primary rounded-r-lg text-black' onClick={add}>+</button>
       </div>
       <div className='btn btn-primary mt-2'>
-        <button className='' onClick={onAdd}>Agregar al carrito</button>
+        {visible?<button className='' onClick={addToCart}>Agregar al carrito</button>
+        :<Link className='' to="/cart">Finalizar compra</Link>}
       </div>       
     </div>
   );

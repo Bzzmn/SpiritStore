@@ -1,5 +1,17 @@
 import ItemCount from './ItemCount';
+import { CartContext } from './context/CartContext';
+import { useContext } from 'react';
+
 const ItemDetail = ({ item }) => {
+
+  const { addItem } = useContext(CartContext);
+
+  const onAdd = (count) => {
+    addItem(item, count);
+    console.log(`Se han agregado ${count} productos al carrito`);
+  }
+
+
   return (
       <div className="card md:card-side bg-base-100 my-10 shadow-xl">
         <figure className='max-w-lg'><img  className='' src={item.img} alt={item.name}/></figure>
@@ -9,7 +21,7 @@ const ItemDetail = ({ item }) => {
           <p className='text-2xl font-semibold'>U${parseFloat(item.price).toFixed(2)}</p>
           <p className='pb-5'>ultimas {item.stock} unidades disponibles</p>
           <div className="card-actions justify-start">
-            <ItemCount stock={item.stock} />
+            <ItemCount stock={item.stock} onAdd={onAdd}/>
           </div>
         </div>
       </div>
