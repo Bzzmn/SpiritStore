@@ -19,25 +19,29 @@ const Cart = () => {
     }
     return (
         <div>
+            <div className="max-w-4xl flex flex-col mx-auto px-5">
             <div className="flex justify-between my-3">
-                <h1 className='text-3xl' >Cart</h1>
-                <button className='btn btn-error' onClick={() => clear()}>Empty cart <img src={emptyCart} alt="" /></button>
+                <h1 className='text-3xl' >Carro de compras</h1>
+                <button className='btn btn-error' onClick={() => clear()}>Vaciar carro <img src={emptyCart} alt="" /></button>
             </div>
            
             <div>
                 {cart.map((i) => (
-                    <div key={i.id} className='flex justify-between'>
+                    <div key={i.id} className='flex justify-between py-1'>
                         <p>{i.name} x {i.quantity}</p>
-                        <p>${i.price * i.quantity}</p>
-                        <button className='btn btn-error' onClick={() => removeItem(i.id)}>Remove <img src={trash} alt="" /></button>
+                        <p>${(i.price * i.quantity).toFixed(2)}</p>
+                        <button className='btn btn-error' onClick={() => removeItem(i.id)}>Eliminar <img src={trash} alt="" /></button>
                     </div>
                 ))}
-                Total: ${getSumPrice()}
+                Total: ${getSumPrice().toFixed(2)}
             </div>
             <div>
-                <Link className='btn btn-primary mt-5 w-full' type='button' to='/checkout'>Checkout</Link>
+                <Link className='btn btn-primary mt-5 w-full' type='button' to='/checkout'>Finalizar compra</Link>
             </div>     
         </div>
+
+        </div>
+       
     )
 }
 
