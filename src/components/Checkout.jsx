@@ -91,7 +91,7 @@ const Checkout = () => {
                             <span>
                                 <p>Tu compra ha sido confirmada!</p>
                                 <p>Tu numero de orden es: {orderId}</p>
-                                <p>Te redigiremos a la tienda en {counter} segudos</p>
+                                <p>Te redirigiremos a la tienda en {counter} segudos</p>
                             </span>
                             </div>
 
