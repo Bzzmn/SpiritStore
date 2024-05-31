@@ -83,20 +83,21 @@ const Checkout = () => {
 
     return (
         <div className='px-4'>
+
+            {orderId && (
+
+                            <div role="alert" className="alert alert-success my-5 max-w-5xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>
+                                <p>Tu compra ha sido confirmada!</p>
+                                <p>Tu numero de orden es: {orderId}</p>
+                                <p>Te redigiremos a la tienda en {counter} segudos</p>
+                            </span>
+                            </div>
+
+                        )}
+
             <div className='justify-center grid md:grid-cols-2 mx-auto gap-8 max-w-5xl' >
-
-                {orderId && (
-
-                    <div role="alert" className="alert alert-success my-5">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>
-                        <p>Tu compra ha sido confirmada!</p>
-                        <p>Tu numero de orden es: {orderId}</p>
-                        <p>Te redigiremos a la tienda en {counter} segudos</p>
-                    </span>
-                    </div>
-                )}
-
                 <form className="w-full max-w-lg justify-end">
                     <div className="flex flex-wrap -mx-3 mb-6">
                         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
