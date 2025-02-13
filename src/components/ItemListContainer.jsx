@@ -1,9 +1,8 @@
-// import itemsArray from './json/itemsArray.json';
 import { useState, useEffect } from 'react';
 import ItemList from './ItemList';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getDocs, collection, getFirestore } from 'firebase/firestore';
-// import { addDoc } from 'firebase/firestore';
+import { getDocs, collection, getFirestore} from 'firebase/firestore';
+
 import Loading from './Loading';
 
 const ItemListContainer = ({ greeting }) => {
@@ -13,37 +12,6 @@ const ItemListContainer = ({ greeting }) => {
   const {id, subId}  = useParams();
   const navigate = useNavigate();
 
-// Cargar productos desde archivo JSON
-  // useEffect(() => {
-  //   const promise = new Promise((resolve) => {
-  //     setTimeout(() => {
-        
-  //       const filteredItems = 
-  //         id && subId ? itemsArray.filter(item => item.category === id && item.subcategory === subId) 
-  //         : id ? itemsArray.filter(item => item.category === id) 
-  //         : itemsArray;
-          
-  //       if(id && filteredItems.length === 0){
-  //         navigate('/404');
-  //       } else {
-  //         resolve(filteredItems);
-  //       }
-  //     }, 200);
-  //   })
-  //   promise.then((data) => {
-  //     setItems(data);
-  //   })
-  // }, [id, subId, navigate]);
-  
-// Cargar todos los productos a la base de datos
-  // const loadItems = () => {
-  //   const db = getFirestore();
-  //   const itemsCollection = collection(db, 'items');
-
-  //   itemsArray.forEach(item => {
-  //     addDoc(itemsCollection, item);
-  //   })
-  // }
 
   useEffect(() => {
     const db = getFirestore();
@@ -76,7 +44,7 @@ const ItemListContainer = ({ greeting }) => {
         <div className="hero-content text-center">
           <div className="max-w-md">
             <h1 className="text-5xl font-bold">{ greeting } </h1>
-            <p className="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
+            <p className="py-6">En nuestro espacio de moda, cada prenda cuenta una historia única y vibrante, pensada para resaltar tu personalidad y energía. Aquí descubrirás las últimas tendencias, diseños auténticos y un estilo que te impulsa a expresarte sin límites. Explora nuestras colecciones, atrévete a experimentar y deja que tu look hable por ti.</p>
             <button className="btn btn-primary">Get Started</button>
           </div>
         

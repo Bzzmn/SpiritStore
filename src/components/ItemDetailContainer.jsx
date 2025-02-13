@@ -11,22 +11,25 @@ const ItemDetailContainer = () => {
   const {id} = useParams();
   const navigate = useNavigate();
 
-// Cargar producto desde Firebase
-useEffect(()=>{
-  const db = getFirestore();
-  const itemDocument = doc(db, 'items', id);
-  getDoc(itemDocument).then((doc) => {
-    if(doc.exists()){
-      setItem({id: doc.id, ...doc.data()});
-      setVisible(false);
-    } else {
+  useEffect(() => {
+    const db = getFirestore();
+    const docId = id.toString();
+    const itemDocument = doc(db, 'items', docId);
+    
+    getDoc(itemDocument).then((doc) => {
+      if (doc.exists()) {
+        setItem({ id: doc.id, ...doc.data() });
+        setVisible(false);
+      } else {
+        navigate('/404');
+      }
+    }).catch(error => {
+      console.error("Error fetching data:", error);
       navigate('/404');
-    }
-  })
+    });
+  }, [id, navigate]);
 
-}, [id, navigate])
- 
-// Cargar producto desde archivo JSON
+  // Cargar producto desde archivo JSON
   // useEffect(() => {
   //   const promise = new Promise((resolve) => {
   //     setTimeout(() => {
@@ -43,11 +46,13 @@ useEffect(()=>{
   //   })
   // }, [id, navigate]);
 
-    return (
-        <div>
-          <div className="hero bg-base-200 flex justify-center align-middle">
-              {visible?<Loading/>:<ItemDetail item={item} />}
-          </div>   
-        </div>
-    )}
+  return (
+    <div>
+      <div className="hero bg-base-200 flex justify-center align-middle">
+        {visible ? <Loading /> : <ItemDetail item={item} />}
+      </div>   
+    </div>
+  );
+}
+
 export default ItemDetailContainer;
