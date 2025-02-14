@@ -50,12 +50,24 @@ COPY --from=builder /app/dist ./dist
 # Set environment variable for port
 ENV PORT=3000
 
-# Expose port
-EXPOSE 3000
+# Expose port more explicitly
+EXPOSE 3000/tcp
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget -qO- http://localhost:3000/ || exit 1
+# Add Traefik labels
+LABEL traefik.enable="true"
+LABEL traefik.docker.network="coolify"
+LABEL traefik.http.routers.spirit-store.rule="Host(`spiritstore.thefullstack.digital`)"
+LABEL traefik.http.services.spirit-store.loadbalancer.server.port="3000"
+LABEL traefik.http.routers.spirit-store.entrypoints="websecure"
+LABEL traefik.http.routers.spirit-store.tls="true"
+LABEL traefik.http.routers.spirit-store.tls.certresolver="letsencrypt"
 
-# Start serve
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
+# Health check with more generous timing
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=5 \
+    CMD curl -f http://localhost:3000/ || exit 1
+
+# Start serve with specific host and port
+CMD ["serve", "-s", "dist", "-l", "tcp://0.0.0.0:3000"]
