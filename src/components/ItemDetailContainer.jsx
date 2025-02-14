@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 // import itemsArray from './json/itemsArray.json';
 import ItemDetail from './ItemDetail';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import Loading from './Loading';
 
 const ItemDetailContainer = () => {
@@ -12,7 +12,7 @@ const ItemDetailContainer = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const db = getFirestore();
+    const db = window.db;
     const docId = id.toString();
     const itemDocument = doc(db, 'items', docId);
     
