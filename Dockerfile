@@ -32,29 +32,31 @@ RUN npm run build
 # Production stage
 FROM nginx:alpine
 
-# Install curl for healthcheck
-RUN apk add --no-cache curl
+# Install debugging tools
+RUN apk add --no-cache curl busybox-extras
 
 # Copy built assets from builder
 COPY --from=build /app/dist /usr/share/nginx/html
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Configure Nginx to log to stdout/stderr
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log
+
+# Debug: Print content of html directory
+RUN echo "Contents of /usr/share/nginx/html:" && \
+    ls -la /usr/share/nginx/html
+
 # Set correct permissions
 RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html
 
-# Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Copy our nginx config
-COPY nginx.conf /etc/nginx/conf.d/
-
 EXPOSE 3000
 
-# Health check
+# Health check with more verbose output
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000/health || exit 1
+    CMD curl -v http://localhost:3000/health || exit 1
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start Nginx with debug mode
+CMD ["nginx", "-g", "daemon off; error_log /dev/stderr debug;"]
