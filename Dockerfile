@@ -56,19 +56,22 @@ EXPOSE 3000/tcp
 # Add Traefik labels with improved configuration
 LABEL traefik.enable="true"
 LABEL traefik.docker.network="coolify"
-LABEL traefik.http.services.spirit-store-service.loadbalancer.server.port="3000"
-LABEL traefik.http.routers.spirit-store.rule="Host(`spiritstore.thefullstack.digital`)"
-LABEL traefik.http.routers.spirit-store.service="spirit-store-service"
-LABEL traefik.http.routers.spirit-store.entrypoints="websecure"
-LABEL traefik.http.routers.spirit-store.tls="true"
-LABEL traefik.http.routers.spirit-store.tls.certresolver="letsencrypt"
+LABEL traefik.http.services.${COOLIFY_SERVICE_ID}.loadbalancer.server.port="3000"
+LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}.rule="Host(`spiritstore.thefullstack.digital`)"
+LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}.service="${COOLIFY_SERVICE_ID}"
+LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}.entrypoints="websecure"
+LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}.tls="true"
+LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}.tls.certresolver="letsencrypt"
+LABEL traefik.http.middlewares.spirit-store-retry.retry.attempts=5
+LABEL traefik.http.middlewares.spirit-store-retry.retry.initialInterval=100ms
+LABEL traefik.http.routers.spirit-store.middlewares=spirit-store-retry
 
 # Install curl for healthcheck
 RUN apk add --no-cache curl
 
 # Health check with more generous timing
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=5 \
-    CMD curl -f http://localhost:3000/ || exit 1
+    CMD curl -f http://localhost:3000/ -H "Accept: text/html" -I || exit 1
 
 # Start serve with specific host and port
-CMD ["serve", "-s", "dist", "-l", "tcp://0.0.0.0:3000"]
+CMD ["serve", "-s", "dist", "-l", "tcp://0.0.0.0:3000", "--single"]

@@ -3,11 +3,11 @@ version: '3'
 services:
   spirit-store:
     image: docker.io/bzzmn/spiritstore:latest
+    environment:
+      - NODE_ENV=production
+      - SERVE_OPTS=--single
     networks:
       - coolify
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=coolify
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
       interval: 30s
