@@ -62,9 +62,13 @@ LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}.service="${COOLIFY_SERVICE_ID}"
 LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}.entrypoints="websecure"
 LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}.tls="true"
 LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}.tls.certresolver="letsencrypt"
-LABEL traefik.http.middlewares.spirit-store-retry.retry.attempts=5
-LABEL traefik.http.middlewares.spirit-store-retry.retry.initialInterval=100ms
-LABEL traefik.http.routers.spirit-store.middlewares=spirit-store-retry
+LABEL traefik.http.middlewares.${COOLIFY_SERVICE_ID}-retry.retry.attempts="5"
+LABEL traefik.http.middlewares.${COOLIFY_SERVICE_ID}-retry.retry.initialInterval="100ms"
+LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}.middlewares="${COOLIFY_SERVICE_ID}-retry"
+LABEL traefik.http.middlewares.redirect-to-https.redirectscheme.scheme="https"
+LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}-http.rule="Host(`spiritstore.thefullstack.digital`)"
+LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}-http.entrypoints="web"
+LABEL traefik.http.routers.${COOLIFY_SERVICE_ID}-http.middlewares="redirect-to-https"
 
 # Install curl for healthcheck
 RUN apk add --no-cache curl
