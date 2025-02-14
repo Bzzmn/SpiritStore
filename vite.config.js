@@ -9,13 +9,15 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     define: {
-      'import.meta.env.VITE_FIREBASE_API_KEY': JSON.stringify(env.VITE_FIREBASE_API_KEY),
-      'import.meta.env.VITE_FIREBASE_AUTH_DOMAIN': JSON.stringify(env.VITE_FIREBASE_AUTH_DOMAIN),
-      'import.meta.env.VITE_FIREBASE_PROJECT_ID': JSON.stringify(env.VITE_FIREBASE_PROJECT_ID),
-      'import.meta.env.VITE_FIREBASE_STORAGE_BUCKET': JSON.stringify(env.VITE_FIREBASE_STORAGE_BUCKET),
-      'import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID': JSON.stringify(env.VITE_FIREBASE_MESSAGING_SENDER_ID),
-      'import.meta.env.VITE_FIREBASE_APP_ID': JSON.stringify(env.VITE_FIREBASE_APP_ID),
-      'import.meta.env.VITE_FIREBASE_MEASUREMENT_ID': JSON.stringify(env.VITE_FIREBASE_MEASUREMENT_ID)
+      __FIREBASE_CONFIG__: JSON.stringify({
+        apiKey: env.VITE_FIREBASE_API_KEY,
+        authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
+        projectId: env.VITE_FIREBASE_PROJECT_ID,
+        storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+        appId: env.VITE_FIREBASE_APP_ID,
+        measurementId: env.VITE_FIREBASE_MEASUREMENT_ID
+      })
     },
     build: {
       sourcemap: true,
