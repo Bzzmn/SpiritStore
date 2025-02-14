@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  spirit-store:
+    image: docker.io/bzzmn/spiritstore:latest
+    networks:
+      - coolify
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=coolify
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+networks:
+  coolify:
+    external: true

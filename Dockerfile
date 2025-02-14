@@ -53,11 +53,12 @@ ENV PORT=3000
 # Expose port more explicitly
 EXPOSE 3000/tcp
 
-# Add Traefik labels
+# Add Traefik labels with improved configuration
 LABEL traefik.enable="true"
 LABEL traefik.docker.network="coolify"
+LABEL traefik.http.services.spirit-store-service.loadbalancer.server.port="3000"
 LABEL traefik.http.routers.spirit-store.rule="Host(`spiritstore.thefullstack.digital`)"
-LABEL traefik.http.services.spirit-store.loadbalancer.server.port="3000"
+LABEL traefik.http.routers.spirit-store.service="spirit-store-service"
 LABEL traefik.http.routers.spirit-store.entrypoints="websecure"
 LABEL traefik.http.routers.spirit-store.tls="true"
 LABEL traefik.http.routers.spirit-store.tls.certresolver="letsencrypt"
