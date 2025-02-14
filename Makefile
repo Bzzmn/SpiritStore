@@ -61,22 +61,56 @@ update:
 	$(NPM) update
 
 # Docker commands
-.PHONY: docker-build
+.PHONY: docker-build docker-run docker-stop docker-clean docker-rebuild
+
+# Load environment variables from .env file
+include .env
+export
+
 docker-build:
-	docker build -t spirit-store .
+	docker build --no-cache \
+		--build-arg VITE_FIREBASE_API_KEY="$(VITE_FIREBASE_API_KEY)" \
+		--build-arg VITE_FIREBASE_AUTH_DOMAIN="$(VITE_FIREBASE_AUTH_DOMAIN)" \
+		--build-arg VITE_FIREBASE_PROJECT_ID="$(VITE_FIREBASE_PROJECT_ID)" \
+		--build-arg VITE_FIREBASE_STORAGE_BUCKET="$(VITE_FIREBASE_STORAGE_BUCKET)" \
+		--build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="$(VITE_FIREBASE_MESSAGING_SENDER_ID)" \
+		--build-arg VITE_FIREBASE_APP_ID="$(VITE_FIREBASE_APP_ID)" \
+		-t spirit-store .
 
-.PHONY: docker-run
 docker-run:
-	docker run -p 3000:3000 spirit-store
+	docker run -p 3000:3000 \
+		--env-file .env \
+		spirit-store
 
-.PHONY: docker-stop
 docker-stop:
-	docker stop $$(docker ps -q --filter ancestor=spirit-store)
+	docker stop $$(docker ps -q --filter ancestor=spirit-store) || true
+
+docker-clean:
+	docker stop $$(docker ps -a -q --filter ancestor=spirit-store) || true
+	docker rm $$(docker ps -a -q --filter ancestor=spirit-store) || true
+	docker rmi spirit-store || true
+
+docker-rebuild: docker-clean docker-build docker-run
 
 # Si el contenedor anterior sigue corriendo, agregar este comando
-.PHONY: docker-clean
-docker-clean:
-	docker rm -f $$(docker ps -aq --filter ancestor=spirit-store)
+.PHONY: docker-run-dev
+docker-run-dev:
+	docker run -p 3000:3000 \
+		--env-file .env \
+		spirit-store
+
+# Para debugging
+.PHONY: docker-run-debug
+docker-run-debug:
+	docker run -p 3000:3000 \
+		-e VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
+		-e VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
+		-e VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
+		-e VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
+		-e VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
+		-e VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
+		-e DEBUG=true \
+		spirit-store
 
 # All: clean install and build
 .PHONY: all

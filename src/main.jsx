@@ -3,7 +3,7 @@ import App from './App.jsx'
 import './index.css'
 import { StrictMode } from 'react'
 import { initializeApp } from "firebase/app";
-import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 
 // Debug: Log all environment variables (remove in production)
 console.log('Environment Variables:', {
@@ -31,8 +31,18 @@ if (!firebaseConfig.projectId) {
 
 try {
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
   
+  // Initialize Firestore with persistence
+  const db = initializeFirestore(app, {
+    cache: {
+      // Enable local persistence
+      localCache: {
+        // Use persistent cache
+        persistent: true
+      }
+    }
+  });
+
   console.log('Firebase Initialization Success:', {
     projectId: app.options.projectId,
     config: firebaseConfig
@@ -40,14 +50,6 @@ try {
 
   // Make db available globally for debugging
   window.db = db;
-  
-  enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code == 'failed-precondition') {
-      console.warn('Multiple tabs open, persistence can only be enabled in one tab at a time.');
-    } else if (err.code == 'unimplemented') {
-      console.warn('The current browser doesn\'t support persistence');
-    }
-  });
 
 } catch (error) {
   console.error('Firebase Initialization Error:', {
@@ -55,7 +57,7 @@ try {
     code: error.code,
     stack: error.stack
   });
-  throw error; // Re-throw to prevent app from running with invalid config
+  throw error;
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
