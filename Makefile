@@ -78,7 +78,7 @@ docker-build:
 		-t spirit-store .
 
 docker-run:
-	docker run -p 3000:80 \
+	docker run -p 3000:3000 \
 		--env-file .env \
 		spirit-store
 
