@@ -7,24 +7,17 @@ import { initializeFirestore } from "firebase/firestore";
 
 // Debug: Log all environment variables (remove in production)
 console.log('Environment Variables:', {
-  apiKey: process.env.VITE_FIREBASE_API_KEY ? 'Present' : 'Missing',
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN ? 'Present' : 'Missing',
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID ? 'Present' : 'Missing',
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET ? 'Present' : 'Missing',
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID ? 'Present' : 'Missing',
-  appId: process.env.VITE_FIREBASE_APP_ID ? 'Present' : 'Missing',
-  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID ? 'Present' : 'Missing'
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? 'Present' : 'Missing',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ? 'Present' : 'Missing',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ? 'Present' : 'Missing',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ? 'Present' : 'Missing',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ? 'Present' : 'Missing',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID ? 'Present' : 'Missing',
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ? 'Present' : 'Missing'
 });
 
-const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY,
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.VITE_FIREBASE_APP_ID,
-  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID
-};
+// Use the globally defined Firebase config
+const firebaseConfig = __FIREBASE_CONFIG__;
 
 // Validate configuration
 if (!firebaseConfig.projectId) {
