@@ -35,8 +35,18 @@ COPY env.js /usr/share/nginx/html/env.js
 
 # Add script to replace environment variables at runtime
 RUN echo '#!/bin/sh' > /docker-entrypoint.d/40-env-config.sh && \
-    echo 'envsubst < /usr/share/nginx/html/env.js > /usr/share/nginx/html/env.js.tmp && \
-    mv /usr/share/nginx/html/env.js.tmp /usr/share/nginx/html/env.js' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'set -e' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'echo "=== Starting environment configuration ==="' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'echo "Checking environment variables..."' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'env | grep VITE_FIREBASE || echo "No Firebase variables found!"' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'echo "\nCurrent env.js content:"' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'cat /usr/share/nginx/html/env.js || echo "env.js not found!"' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'echo "\nReplacing variables..."' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'envsubst < /usr/share/nginx/html/env.js > /usr/share/nginx/html/env.js.tmp || echo "Failed to replace variables!"' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'mv /usr/share/nginx/html/env.js.tmp /usr/share/nginx/html/env.js' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'echo "\nNew env.js content:"' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'cat /usr/share/nginx/html/env.js || echo "New env.js not found!"' >> /docker-entrypoint.d/40-env-config.sh && \
+    echo 'echo "=== Environment configuration complete ==="' >> /docker-entrypoint.d/40-env-config.sh && \
     chmod +x /docker-entrypoint.d/40-env-config.sh
 
 # Add nginx configuration for React Router with security headers

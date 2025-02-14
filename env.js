@@ -15,7 +15,7 @@
   });
 
   // Verificar que todas las variables estén definidas
-  const missingVars = Object.entries(window.ENV).filter(([_, value]) => !value);
+  const missingVars = Object.entries(window.ENV).filter(([_, value]) => !value || value.includes('$'));
   if (missingVars.length > 0) {
     console.error('Missing environment variables:', missingVars.map(([key]) => key));
   } else {
