@@ -7,6 +7,12 @@
             "port": 80
         }
     },
+    "services": {
+        "main": {
+            "port": 80,
+            "protocol": "http"
+        }
+    },
     "persistentStorage": [],
     "proxy": {
         "port": 80,
