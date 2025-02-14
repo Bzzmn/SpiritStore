@@ -78,7 +78,7 @@ docker-build:
 		-t spirit-store .
 
 docker-run:
-	docker run -p 3000:3000 \
+	docker run -p 3000:80 \
 		--env-file .env \
 		spirit-store
 
@@ -95,14 +95,14 @@ docker-rebuild: docker-clean docker-build docker-run
 # Si el contenedor anterior sigue corriendo, agregar este comando
 .PHONY: docker-run-dev
 docker-run-dev:
-	docker run -p 3000:3000 \
+	docker run -p 3000:80 \
 		--env-file .env \
 		spirit-store
 
 # Para debugging
 .PHONY: docker-run-debug
 docker-run-debug:
-	docker run -p 3000:3000 \
+	docker run -p 3000:80 \
 		-e VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
 		-e VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
 		-e VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
