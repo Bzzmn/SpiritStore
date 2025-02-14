@@ -29,10 +29,13 @@ COPY . .
 # Build the application
 RUN npm run build
 
+# Create serve configuration
+RUN echo '{"rewrites": [{ "source": "/**", "destination": "/index.html" }]}' > serve.json
+
 # Install serve globally
 RUN npm install -g serve
 
 EXPOSE 3000
 
-# Use serve to host the static files
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Use serve with the configuration file
+CMD ["serve", "-s", "dist", "-l", "3000", "--config", "serve.json"]
