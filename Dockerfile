@@ -35,7 +35,14 @@ RUN echo '{"rewrites": [{ "source": "/**", "destination": "/index.html" }]}' > d
 # Install serve globally
 RUN npm install -g serve
 
-EXPOSE 3000
+# Set environment variable for port
+ENV PORT=3000
 
-# Use serve with the configuration file
-CMD ["serve", "-s", "dist", "-l", "3000"]
+EXPOSE ${PORT}
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/ || exit 1
+
+# Use serve with explicit host binding
+CMD ["sh", "-c", "serve -s dist -l tcp://0.0.0.0:${PORT}"]
