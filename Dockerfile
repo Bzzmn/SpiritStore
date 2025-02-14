@@ -19,34 +19,21 @@ RUN npm run build
 # Production stage
 FROM nginx:alpine
 
-# Create nginx temp directories
+# Copy built files
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Create required directories and set permissions
 RUN mkdir -p /var/cache/nginx \
-    /var/cache/nginx/client_temp \
-    /var/cache/nginx/proxy_temp \
-    /var/cache/nginx/fastcgi_temp \
-    /var/cache/nginx/uwsgi_temp \
-    /var/cache/nginx/scgi_temp \
-    && chmod 755 /var/cache/nginx \
     && chown -R nginx:nginx /var/cache/nginx \
     && chown -R nginx:nginx /var/log/nginx \
     && chown -R nginx:nginx /etc/nginx/conf.d \
+    && chown -R nginx:nginx /usr/share/nginx/html \
+    && chmod -R 755 /usr/share/nginx/html \
     && touch /var/run/nginx.pid \
-    && chown -R nginx:nginx /var/run/nginx.pid
-
-# Copy built assets from build stage
-COPY --from=build /app/dist /usr/share/nginx/html
-RUN chown -R nginx:nginx /usr/share/nginx/html \
-    && chmod -R 755 /usr/share/nginx/html
-
-# Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Create a basic health check page
-RUN echo "OK" > /usr/share/nginx/html/health \
-    && chown nginx:nginx /usr/share/nginx/html/health
+    && chown nginx:nginx /var/run/nginx.pid
 
 # Switch to non-root user
 USER nginx
