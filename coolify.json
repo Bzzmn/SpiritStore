@@ -1,10 +1,10 @@
 {
-    "port": 3000,
+    "port": 80,
     "pullmergeRequestPreviewsEnabled": true,
     "dockerRegistryImagePrefix": null,
     "buildPacks": {
         "nodejs": {
-            "port": 3000
+            "port": 80
         }
     },
     "persistentStorage": [],

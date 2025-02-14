@@ -1,6 +1,8 @@
 # Variables
 VITE = ./node_modules/.bin/vite
 NPM = npm
+LOCAL_PORT=3001
+CONTAINER_PORT=80
 
 # Default target
 .DEFAULT_GOAL := help
@@ -78,7 +80,7 @@ docker-build:
 		-t spirit-store .
 
 docker-run:
-	docker run -p 3000:3000 \
+	docker run -p $(LOCAL_PORT):$(CONTAINER_PORT) \
 		--env-file .env \
 		spirit-store
 
@@ -92,17 +94,17 @@ docker-clean:
 
 docker-rebuild: docker-clean docker-build docker-run
 
-# Si el contenedor anterior sigue corriendo, agregar este comando
+# Para desarrollo local
 .PHONY: docker-run-dev
 docker-run-dev:
-	docker run -p 3000:80 \
+	docker run -p $(LOCAL_PORT):$(CONTAINER_PORT) \
 		--env-file .env \
 		spirit-store
 
 # Para debugging
 .PHONY: docker-run-debug
 docker-run-debug:
-	docker run -p 3000:80 \
+	docker run -p $(LOCAL_PORT):$(CONTAINER_PORT) \
 		-e VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
 		-e VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
 		-e VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \

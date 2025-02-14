@@ -37,26 +37,24 @@ RUN apk add --no-cache curl busybox-extras
 
 # Copy built assets from builder
 COPY --from=build /app/dist /usr/share/nginx/html
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Configure Nginx to log to stdout/stderr
+# Copy nginx configurations
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+# Configure logging
 RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log
-
-# Debug: Print content of html directory
-RUN echo "Contents of /usr/share/nginx/html:" && \
-    ls -la /usr/share/nginx/html
 
 # Set correct permissions
 RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html
 
-EXPOSE 3000
+EXPOSE 80
 
 # Health check with more verbose output
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -v http://localhost:3000/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
 
 # Start Nginx with debug mode
-CMD ["nginx", "-g", "daemon off; error_log /dev/stderr debug;"]
+CMD ["nginx", "-g", "daemon off;"]
