@@ -50,12 +50,32 @@ check-port:
 		exit 1 ; \
 	fi
 
+# Verificar variables de entorno
+check-env:
+	@echo "$(CYAN)Verificando variables de entorno...$(RESET)"
+	@for var in VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN VITE_FIREBASE_PROJECT_ID VITE_FIREBASE_STORAGE_BUCKET VITE_FIREBASE_MESSAGING_SENDER_ID VITE_FIREBASE_APP_ID VITE_FIREBASE_MEASUREMENT_ID; do \
+		if ! grep -q "^$$var=" .env; then \
+			echo "$(RED)Error: Variable $$var no encontrada en .env$(RESET)"; \
+			exit 1; \
+		fi; \
+	done
+	@echo "$(GREEN)Variables de entorno OK$(RESET)"
+
 # Ejecutar el contenedor
-run: check-port
+run: check-port check-env
 	@echo "$(CYAN)Iniciando contenedor...$(RESET)"
+	@echo "$(YELLOW)Variables de entorno que se pasarán al contenedor:$(RESET)"
+	@grep -E "^VITE_FIREBASE_" .env
 	docker run -d \
 		--name $(CONTAINER_NAME) \
 		-p $(PORT):80 \
+		-e VITE_FIREBASE_API_KEY="$$(grep VITE_FIREBASE_API_KEY .env | cut -d '=' -f2)" \
+		-e VITE_FIREBASE_AUTH_DOMAIN="$$(grep VITE_FIREBASE_AUTH_DOMAIN .env | cut -d '=' -f2)" \
+		-e VITE_FIREBASE_PROJECT_ID="$$(grep VITE_FIREBASE_PROJECT_ID .env | cut -d '=' -f2)" \
+		-e VITE_FIREBASE_STORAGE_BUCKET="$$(grep VITE_FIREBASE_STORAGE_BUCKET .env | cut -d '=' -f2)" \
+		-e VITE_FIREBASE_MESSAGING_SENDER_ID="$$(grep VITE_FIREBASE_MESSAGING_SENDER_ID .env | cut -d '=' -f2)" \
+		-e VITE_FIREBASE_APP_ID="$$(grep VITE_FIREBASE_APP_ID .env | cut -d '=' -f2)" \
+		-e VITE_FIREBASE_MEASUREMENT_ID="$$(grep VITE_FIREBASE_MEASUREMENT_ID .env | cut -d '=' -f2)" \
 		$(IMAGE_NAME)
 	@echo "$(GREEN)Aplicación disponible en http://localhost:$(PORT)$(RESET)"
 

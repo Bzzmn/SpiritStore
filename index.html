@@ -1,14 +1,21 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png+xml" href="./src/assets/favicon-white.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spirit Store</title>
-  </head>
-  <body>
-    <div class="flex flex-col h-full min-h-dvh" id="root">
-    </div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com;">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <title>Spirit Store</title>
+  <script src="/env.js"></script>
+</head>
+
+<body>
+  <div class="flex flex-col h-full min-h-dvh" id="root">
+  </div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>
