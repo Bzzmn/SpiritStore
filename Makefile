@@ -2,6 +2,7 @@
 IMAGE_NAME = spiritstore
 CONTAINER_NAME = spiritstore
 PORT = 8080
+export DOCKER_BUILDKIT := 1
 
 # Colores para los mensajes
 CYAN = \033[0;36m
@@ -24,18 +25,19 @@ help:
 	@echo "  $(GREEN)make status$(RESET)  - Muestra el estado de los contenedores"
 	@echo "  $(GREEN)make ports$(RESET)   - Muestra los puertos en uso"
 
+# Create temporary env file for build
+.PHONY: create-build-env
+create-build-env:
+	@echo "$(CYAN)Creando archivo de variables de entorno temporal...$(RESET)"
+	@grep -E "^VITE_FIREBASE_" .env > .env.build
+
 # Construir la imagen
-build:
+build: create-build-env
 	@echo "$(CYAN)Construyendo imagen Docker...$(RESET)"
-	docker build -t $(IMAGE_NAME) \
-		--build-arg VITE_FIREBASE_API_KEY="$$(grep VITE_FIREBASE_API_KEY .env | cut -d '=' -f2)" \
-		--build-arg VITE_FIREBASE_AUTH_DOMAIN="$$(grep VITE_FIREBASE_AUTH_DOMAIN .env | cut -d '=' -f2)" \
-		--build-arg VITE_FIREBASE_PROJECT_ID="$$(grep VITE_FIREBASE_PROJECT_ID .env | cut -d '=' -f2)" \
-		--build-arg VITE_FIREBASE_STORAGE_BUCKET="$$(grep VITE_FIREBASE_STORAGE_BUCKET .env | cut -d '=' -f2)" \
-		--build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="$$(grep VITE_FIREBASE_MESSAGING_SENDER_ID .env | cut -d '=' -f2)" \
-		--build-arg VITE_FIREBASE_APP_ID="$$(grep VITE_FIREBASE_APP_ID .env | cut -d '=' -f2)" \
-		--build-arg VITE_FIREBASE_MEASUREMENT_ID="$$(grep VITE_FIREBASE_MEASUREMENT_ID .env | cut -d '=' -f2)" \
-		.
+	DOCKER_BUILDKIT=1 docker build \
+		--secret id=firebase_env,src=.env.build \
+		-t $(IMAGE_NAME) .
+	@rm -f .env.build
 
 # Verificar puerto antes de ejecutar
 check-port:
