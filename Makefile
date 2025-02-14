@@ -2,7 +2,7 @@
 VITE = ./node_modules/.bin/vite
 NPM = npm
 LOCAL_PORT=3001
-CONTAINER_PORT=80
+CONTAINER_PORT=3000
 
 # Default target
 .DEFAULT_GOAL := help

@@ -47,14 +47,15 @@ RUN npm install -g serve
 # Copy built files
 COPY --from=builder /app/dist ./dist
 
-# Debug: Show contents
-RUN ls -la
+# Set environment variable for port
+ENV PORT=3000
 
-EXPOSE 80
+# Expose port
+EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget -qO- http://localhost:80/ || exit 1
+    CMD wget -qO- http://localhost:3000/ || exit 1
 
 # Start serve
-CMD ["serve", "-s", "dist", "-l", "80"]
+CMD ["serve", "-s", "dist", "-l", "3000"]
