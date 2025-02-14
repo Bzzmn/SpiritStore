@@ -3,39 +3,36 @@ name: Docker Build and Deploy
 on:
   push:
     branches: [ "main" ]
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "main" ]
 
 env:
-  REGISTRY: docker.io
-  IMAGE_NAME: bzzmn/spiritstore
+  DOCKER_HUB_REPOSITORY: bzzmn/spiritstore
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Log in to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.DOCKER_HUB_REPOSITORY }}:latest
           build-args: |
             VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
             VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
@@ -43,24 +40,25 @@ jobs:
             VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
             VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
             VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   deploy:
-    needs: build-and-push
+    name: Deploy to Coolify
+    needs: build
+    if: |
+      needs.build.result == 'success' && 
+      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
+    
     steps:
       - name: Deploy to Coolify
-        uses: coollabsio/coolify-github-action@v0.1.4
+        uses: coolify-io/github-action@v0.1.4
         with:
           deploy_hook: ${{ secrets.COOLIFY_DEPLOY_HOOK }}
 
       - name: Verify Deployment
         run: |
           echo "🚀 New deployment details:"
-          echo "- Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          echo "- Image: ${{ env.DOCKER_HUB_REPOSITORY }}"
           echo "- Tag: latest"
           echo "⏳ Waiting for Coolify to pull and start the new container..."
           sleep 30
@@ -69,7 +67,7 @@ jobs:
         if: always()
         run: |
           echo "### Deployment Status 🚀" >> $GITHUB_STEP_SUMMARY
-          echo "- **Image**: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image**: ${{ env.DOCKER_HUB_REPOSITORY }}:latest" >> $GITHUB_STEP_SUMMARY
           echo "- **Timestamp**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" = "success" ]; then
             echo "✅ Deployment completed successfully" >> $GITHUB_STEP_SUMMARY
