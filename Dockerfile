@@ -1,80 +1,49 @@
-# Build stage
+# Stage 1: Build the application
 FROM node:20-alpine as builder
 
+# Set working directory
 WORKDIR /app
 
-# Add build arguments
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Build the application with environment variables
 ARG VITE_FIREBASE_API_KEY
 ARG VITE_FIREBASE_AUTH_DOMAIN
 ARG VITE_FIREBASE_PROJECT_ID
 ARG VITE_FIREBASE_STORAGE_BUCKET
 ARG VITE_FIREBASE_MESSAGING_SENDER_ID
 ARG VITE_FIREBASE_APP_ID
-
-# Debug: Print environment variables
-RUN echo "Checking build arguments:"
-RUN echo "VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY:+is set}"
-RUN echo "VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID:+is set}"
-
-# Create .env file
-RUN echo "VITE_FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}" > .env && \
-    echo "VITE_FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}" >> .env && \
-    echo "VITE_FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}" >> .env && \
-    echo "VITE_FIREBASE_STORAGE_BUCKET=${VITE_FIREBASE_STORAGE_BUCKET}" >> .env && \
-    echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}" >> .env && \
-    echo "VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}" >> .env
-
-# Debug: Show .env contents (mask sensitive data)
-RUN cat .env | sed 's/=.*$/=MASKED/'
+ARG VITE_FIREBASE_MEASUREMENT_ID
 
 # Build the application
-COPY package*.json ./
-RUN npm install
-COPY . .
 RUN npm run build
 
-# Debug: Show dist contents
-RUN ls -la dist
+# Stage 2: Serve the application
+FROM nginx:alpine
 
-# Production stage
-FROM node:20-alpine
+# Copy the built assets from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-WORKDIR /app
+# Add nginx configuration for React Router
+RUN echo ' \
+    server { \
+    listen 80; \
+    location / { \
+    root /usr/share/nginx/html; \
+    index index.html index.htm; \
+    try_files $uri $uri/ /index.html; \
+    } \
+    }' > /etc/nginx/conf.d/default.conf
 
-# Install serve
-RUN npm install -g serve
+# Expose port 80
+EXPOSE 80
 
-# Copy built files
-COPY --from=builder /app/dist ./dist
-
-# Set environment variable for port
-ENV PORT=3000
-
-# Expose port more explicitly
-EXPOSE 3000/tcp
-
-# Update Traefik labels to use container name instead of COOLIFY_SERVICE_ID
-LABEL traefik.enable="true"
-LABEL traefik.docker.network="coolify"
-LABEL traefik.http.services.spirit-store.loadbalancer.server.port="3000"
-LABEL traefik.http.routers.spirit-store.rule="Host(`spiritstore.thefullstack.digital`)"
-LABEL traefik.http.routers.spirit-store.service="spirit-store"
-LABEL traefik.http.routers.spirit-store.entrypoints="websecure"
-LABEL traefik.http.routers.spirit-store.tls="true"
-LABEL traefik.http.routers.spirit-store.tls.certresolver="letsencrypt"
-
-# HTTP to HTTPS redirect
-LABEL traefik.http.routers.spirit-store-http.rule="Host(`spiritstore.thefullstack.digital`)"
-LABEL traefik.http.routers.spirit-store-http.entrypoints="web"
-LABEL traefik.http.routers.spirit-store-http.middlewares="redirect-to-https"
-LABEL traefik.http.middlewares.redirect-to-https.redirectscheme.scheme="https"
-
-# Install curl for healthcheck
-RUN apk add --no-cache curl
-
-# Health check with more generous timing
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=5 \
-    CMD curl -f http://localhost:3000/ -H "Accept: text/html" -I || exit 1
-
-# Start serve with specific host and port
-CMD ["serve", "-s", "dist", "-l", "tcp://0.0.0.0:3000", "--single"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"] 

@@ -8,12 +8,22 @@ on:
     branches: [ "main" ]
 
 env:
-  DOCKER_HUB_REPOSITORY: bzzmn/spiritstore
+  REGISTRY_DOCKERHUB: docker.io
+  REGISTRY_GITHUB: ghcr.io
+  IMAGE_NAME: spiritstore
 
 jobs:
   build:
+    name: Build Docker Image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      job_status: ${{ job.status }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,18 +31,38 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
+      - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=sha,format=short
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
-          tags: ${{ env.DOCKER_HUB_REPOSITORY }}:latest
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
             VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
@@ -40,6 +70,9 @@ jobs:
             VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
             VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
             VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
+            VITE_FIREBASE_MEASUREMENT_ID=${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy:
     name: Deploy to Coolify
@@ -50,16 +83,16 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Deploy to Coolify
-        uses: coolify-io/github-action@v0.1.4
-        with:
-          deploy_hook: ${{ secrets.COOLIFY_DEPLOY_HOOK }}
+      - name: Trigger deployment in Coolify
+        run: |
+          curl --request GET "${{ secrets.COOLIFY_WEBHOOK }}" \
+               --header "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
 
       - name: Verify Deployment
         run: |
           echo "🚀 New deployment details:"
-          echo "- Image: ${{ env.DOCKER_HUB_REPOSITORY }}"
-          echo "- Tag: latest"
+          echo "- Image: docker.io/${{ secrets.DOCKER_USERNAME }}/spiritstore"
+          echo "- Tag: sha-${{ github.sha }}"
           echo "⏳ Waiting for Coolify to pull and start the new container..."
           sleep 30
 
@@ -67,10 +100,10 @@ jobs:
         if: always()
         run: |
           echo "### Deployment Status 🚀" >> $GITHUB_STEP_SUMMARY
-          echo "- **Image**: ${{ env.DOCKER_HUB_REPOSITORY }}:latest" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image**: docker.io/${{ secrets.DOCKER_USERNAME }}/spiritstore:sha-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: Production" >> $GITHUB_STEP_SUMMARY
           echo "- **Timestamp**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" = "success" ]; then
             echo "✅ Deployment completed successfully" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ Deployment failed" >> $GITHUB_STEP_SUMMARY
-          fi 
+            echo "❌ Deployment failed" >> $GITHUB_STEP_SUMMARY 

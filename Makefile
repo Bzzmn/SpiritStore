@@ -1,119 +1,90 @@
 # Variables
-VITE = ./node_modules/.bin/vite
-NPM = npm
-LOCAL_PORT=3001
-CONTAINER_PORT=3000
+IMAGE_NAME = spiritstore
+CONTAINER_NAME = spiritstore
+PORT = 8080
 
-# Default target
-.DEFAULT_GOAL := help
-
-# Colors
+# Colores para los mensajes
 CYAN = \033[0;36m
-NC = \033[0m # No Color
+GREEN = \033[0;32m
+RED = \033[0;31m
+YELLOW = \033[1;33m
+RESET = \033[0m
 
-# Help
-.PHONY: help
+.PHONY: help build run stop clean logs shell status ports
+
+# Objetivo por defecto
 help:
-	@echo "$(CYAN)Available commands:$(NC)"
-	@echo "$(CYAN)make install$(NC)    - Install dependencies"
-	@echo "$(CYAN)make dev$(NC)        - Start development server"
-	@echo "$(CYAN)make build$(NC)      - Build for production"
-	@echo "$(CYAN)make preview$(NC)    - Preview production build"
-	@echo "$(CYAN)make clean$(NC)      - Clean build directory"
-	@echo "$(CYAN)make lint$(NC)       - Run ESLint"
-	@echo "$(CYAN)make update$(NC)     - Update dependencies"
-	@echo "$(CYAN)make docker-build$(NC) - Build Docker image"
-	@echo "$(CYAN)make docker-run$(NC)   - Run Docker container"
-	@echo "$(CYAN)make docker-stop$(NC)  - Stop Docker container"
+	@echo "$(CYAN)Comandos disponibles:$(RESET)"
+	@echo "  $(GREEN)make build$(RESET)   - Construye la imagen Docker"
+	@echo "  $(GREEN)make run$(RESET)     - Ejecuta el contenedor"
+	@echo "  $(GREEN)make stop$(RESET)    - Detiene el contenedor"
+	@echo "  $(GREEN)make clean$(RESET)   - Elimina el contenedor e imagen"
+	@echo "  $(GREEN)make logs$(RESET)    - Muestra los logs del contenedor"
+	@echo "  $(GREEN)make shell$(RESET)   - Abre una shell en el contenedor"
+	@echo "  $(GREEN)make status$(RESET)  - Muestra el estado de los contenedores"
+	@echo "  $(GREEN)make ports$(RESET)   - Muestra los puertos en uso"
 
-# Install dependencies
-.PHONY: install
-install:
-	$(NPM) install
-
-# Start development server
-.PHONY: dev
-dev:
-	$(NPM) run dev
-
-# Build for production
-.PHONY: build
+# Construir la imagen
 build:
-	$(NPM) run build
+	@echo "$(CYAN)Construyendo imagen Docker...$(RESET)"
+	docker build -t $(IMAGE_NAME) \
+		--build-arg VITE_FIREBASE_API_KEY="$$(grep VITE_FIREBASE_API_KEY .env | cut -d '=' -f2)" \
+		--build-arg VITE_FIREBASE_AUTH_DOMAIN="$$(grep VITE_FIREBASE_AUTH_DOMAIN .env | cut -d '=' -f2)" \
+		--build-arg VITE_FIREBASE_PROJECT_ID="$$(grep VITE_FIREBASE_PROJECT_ID .env | cut -d '=' -f2)" \
+		--build-arg VITE_FIREBASE_STORAGE_BUCKET="$$(grep VITE_FIREBASE_STORAGE_BUCKET .env | cut -d '=' -f2)" \
+		--build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="$$(grep VITE_FIREBASE_MESSAGING_SENDER_ID .env | cut -d '=' -f2)" \
+		--build-arg VITE_FIREBASE_APP_ID="$$(grep VITE_FIREBASE_APP_ID .env | cut -d '=' -f2)" \
+		--build-arg VITE_FIREBASE_MEASUREMENT_ID="$$(grep VITE_FIREBASE_MEASUREMENT_ID .env | cut -d '=' -f2)" \
+		.
 
-# Preview production build
-.PHONY: preview
-preview:
-	$(NPM) run preview
+# Verificar puerto antes de ejecutar
+check-port:
+	@if lsof -Pi :$(PORT) -sTCP:LISTEN -t >/dev/null ; then \
+		echo "$(RED)Error: El puerto $(PORT) ya está en uso.$(RESET)" ; \
+		echo "$(YELLOW)Puedes:$(RESET)" ; \
+		echo "1. Usar un puerto diferente: PORT=<nuevo_puerto> make run" ; \
+		echo "2. Verificar qué está usando el puerto: make ports" ; \
+		echo "3. Detener otros contenedores: make stop" ; \
+		exit 1 ; \
+	fi
 
-# Clean build directory
-.PHONY: clean
-clean:
-	rm -rf dist
-	rm -rf node_modules
+# Ejecutar el contenedor
+run: check-port
+	@echo "$(CYAN)Iniciando contenedor...$(RESET)"
+	docker run -d \
+		--name $(CONTAINER_NAME) \
+		-p $(PORT):80 \
+		$(IMAGE_NAME)
+	@echo "$(GREEN)Aplicación disponible en http://localhost:$(PORT)$(RESET)"
 
-# Lint code
-.PHONY: lint
-lint:
-	$(NPM) run lint
+# Detener el contenedor
+stop:
+	@echo "$(CYAN)Deteniendo contenedor...$(RESET)"
+	docker stop $(CONTAINER_NAME) || true
+	docker rm $(CONTAINER_NAME) || true
 
-# Update dependencies
-.PHONY: update
-update:
-	$(NPM) update
+# Limpiar contenedor e imagen
+clean: stop
+	@echo "$(CYAN)Eliminando imagen...$(RESET)"
+	docker rmi $(IMAGE_NAME) || true
 
-# Docker commands
-.PHONY: docker-build docker-run docker-stop docker-clean docker-rebuild
+# Ver logs del contenedor
+logs:
+	@echo "$(CYAN)Mostrando logs...$(RESET)"
+	docker logs -f $(CONTAINER_NAME)
 
-# Load environment variables from .env file
-include .env
-export
+# Abrir shell en el contenedor
+shell:
+	@echo "$(CYAN)Abriendo shell en el contenedor...$(RESET)"
+	docker exec -it $(CONTAINER_NAME) /bin/sh
 
-docker-build:
-	docker build --no-cache \
-		--build-arg VITE_FIREBASE_API_KEY="$(VITE_FIREBASE_API_KEY)" \
-		--build-arg VITE_FIREBASE_AUTH_DOMAIN="$(VITE_FIREBASE_AUTH_DOMAIN)" \
-		--build-arg VITE_FIREBASE_PROJECT_ID="$(VITE_FIREBASE_PROJECT_ID)" \
-		--build-arg VITE_FIREBASE_STORAGE_BUCKET="$(VITE_FIREBASE_STORAGE_BUCKET)" \
-		--build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="$(VITE_FIREBASE_MESSAGING_SENDER_ID)" \
-		--build-arg VITE_FIREBASE_APP_ID="$(VITE_FIREBASE_APP_ID)" \
-		-t spirit-store .
+# Mostrar estado de los contenedores
+status:
+	@echo "$(CYAN)Estado de los contenedores:$(RESET)"
+	docker ps -a
 
-docker-run:
-	docker run -p $(LOCAL_PORT):$(CONTAINER_PORT) \
-		--env-file .env \
-		spirit-store
-
-docker-stop:
-	docker stop $$(docker ps -q --filter ancestor=spirit-store) || true
-
-docker-clean:
-	docker stop $$(docker ps -a -q --filter ancestor=spirit-store) || true
-	docker rm $$(docker ps -a -q --filter ancestor=spirit-store) || true
-	docker rmi spirit-store || true
-
-docker-rebuild: docker-clean docker-build docker-run
-
-# Para desarrollo local
-.PHONY: docker-run-dev
-docker-run-dev:
-	docker run -p $(LOCAL_PORT):$(CONTAINER_PORT) \
-		--env-file .env \
-		spirit-store
-
-# Para debugging
-.PHONY: docker-run-debug
-docker-run-debug:
-	docker run -p $(LOCAL_PORT):$(CONTAINER_PORT) \
-		-e VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
-		-e VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
-		-e VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
-		-e VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
-		-e VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
-		-e VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
-		-e DEBUG=true \
-		spirit-store
-
-# All: clean install and build
-.PHONY: all
-all: clean install build 
+# Mostrar puertos en uso
+ports:
+	@echo "$(CYAN)Puertos en uso:$(RESET)"
+	@echo "$(YELLOW)Procesos usando el puerto $(PORT):$(RESET)"
+	@lsof -i :$(PORT) || echo "$(GREEN)El puerto $(PORT) está libre$(RESET)" 
