@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ format('{0}/{1}', github.repository_owner, 'spiritstore') | lower }}
+  IMAGE_NAME: ${{ github.repository_owner }}/spiritstore
 
 jobs:
   build:
@@ -73,7 +73,7 @@ jobs:
     
     steps:
       - name: Deploy to Coolify
-        uses: coolify-io/github-action@v0.1.4
+        uses: coollabsio/coolify-github-action@v0.1.4
         with:
           deploy_hook: ${{ secrets.COOLIFY_DEPLOY_HOOK }}
 
