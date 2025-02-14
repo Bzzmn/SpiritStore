@@ -29,8 +29,8 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Create serve configuration
-RUN echo '{"rewrites": [{ "source": "/**", "destination": "/index.html" }]}' > serve.json
+# Create serve configuration in dist directory
+RUN echo '{"rewrites": [{ "source": "/**", "destination": "/index.html" }]}' > dist/serve.json
 
 # Install serve globally
 RUN npm install -g serve
@@ -38,4 +38,4 @@ RUN npm install -g serve
 EXPOSE 3000
 
 # Use serve with the configuration file
-CMD ["serve", "-s", "dist", "-l", "3000", "--config", "serve.json"]
+CMD ["serve", "-s", "dist", "-l", "3000"]
