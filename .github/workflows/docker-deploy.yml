@@ -9,9 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # IMAGE_NAME: ${{ github.repository_owner }}/spiritstore
-  # or explicitly lowercase:
-  IMAGE_NAME: bzzmn/spiritstore
+  IMAGE_NAME: ${{ format('{0}/{1}', github.repository_owner, 'spiritstore') | lower }}
 
 jobs:
   build:
